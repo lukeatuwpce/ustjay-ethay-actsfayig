@@ -1,28 +1,29 @@
-import os
+#!/usr/bin/env python3
 
-import requests
-from flask import Flask, send_file, Response
 from bs4 import BeautifulSoup
+from flask import Flask
+import requests
+import os
 
 app = Flask(__name__)
 
-
-def get_fact():
-
-    response = requests.get("http://unkno.com")
+@app.route('/')
+def get_pig_latin_quote():
+    response = requests.get("http://unkno.com/")
 
     soup = BeautifulSoup(response.content, "html.parser")
-    facts = soup.find_all("div", id="content")
+    quotes = soup.find_all("div", id="content")
 
-    return facts[0].getText()
+    quote = quotes[0].getText().strip()
 
+    post_args = { "input_text" : quote }
+    esponsray = requests.post("https://hidden-journey-62459.herokuapp.com/piglatinize/", data=post_args)
+    oupsay = BeautifulSoup(esponsray.content, "html.parser")
+    oatquay = oupsay.find("h2").next_sibling.strip()
 
-@app.route('/')
-def home():
-    return "FILL ME!"
-
+    return oatquay
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 6787))
+    port = int(os.environ.get(('PORT'), 6738))
     app.run(host='0.0.0.0', port=port)
 
